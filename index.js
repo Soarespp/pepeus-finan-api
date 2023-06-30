@@ -2,6 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const { default: mongoose } = require("mongoose");
 const userRoutes = require("./routes/userRoutes");
+const parceladosRoutes = require("./routes/parceladosRoutes");
+const carteiraRoutes = require("./routes/carteiraRoutes");
+const lancamentosRoutes = require("./routes/lancamentosRoutes");
+const extasRoutes = require("./routes/extrasRoutes");
 const cors = require("cors");
 
 const app = express();
@@ -15,8 +19,12 @@ app.get("/", (req, res) => {
   res.json({ message: "sucesso" });
 });
 
-//User
+//Routes
 app.use("/user", userRoutes);
+app.use("/parcelados", parceladosRoutes);
+app.use("/carteira", carteiraRoutes);
+app.use("/lancamentos", lancamentosRoutes);
+app.use("/extras", extasRoutes);
 
 const user = process.env.DB_USER;
 const senha = encodeURIComponent(process.env.DB_PASSWORD);

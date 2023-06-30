@@ -1,12 +1,15 @@
+const Carteira = require("../Models/Carteira");
+const Extra = require("../Models/Extra");
+const Lancamentos = require("../Models/Lancamentos");
+const Parcelados = require("../Models/Parcelados");
 const User = require("../Models/User");
 const router = require("express").Router();
 
 router.get("/", async (req, res) => {
-  console.log("user get");
   try {
-    const users = await User.find();
+    const user = await User.find(req.query);
 
-    res.status(201).json({ users });
+    res.status(201).json({ user, sucess: true });
   } catch (error) {
     res.status(500).json({ error: error, sucess: false });
   }
@@ -25,6 +28,7 @@ router.get("/login/:user/:pass", async (req, res) => {
     }
 
     const usuario = {
+      _id: usuarioFind._id,
       name: usuarioFind.name,
       pass: usuarioFind.pass,
       user: usuarioFind.user,
@@ -40,40 +44,39 @@ router.get("/login/:user/:pass", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const users = await User.findOne({ _id: req.params.id });
+    const user = await User.findOne({ _id: req.params.id });
 
-    res.status(201).json({ users });
+    res.status(201).json({ user, sucess: true });
   } catch (error) {
     res.status(500).json({ error: error, sucess: false });
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/", async (req, res) => {
   try {
+    const dataUpdate = { ...req.body, pass: req.body.pass };
     const users = await User.findOneAndReplace(
-      { _id: req.params.id },
-      { ...req.body }
+      { _id: req.body._id },
+      { ...dataUpdate }
     );
 
-    console.log({ users });
     res.status(201).json({ users, sucess: true });
   } catch (error) {
     res.status(500).json({ error: error, sucess: false });
   }
 });
 
-router.delete("/:id", async (req, res) => {
-  try {
-    const users = await User.findOneAndDelete({ _id: req.params.id });
+// router.delete("/:id", async (req, res) => {
+//   try {
+//     const user = await User.findOneAndDelete({ _id: req.params.id });
 
-    res.status(201).json({ users, sucess: true });
-  } catch (error) {
-    res.status(500).json({ error: error, sucess: false });
-  }
-});
+//     res.status(201).json({ user, sucess: true });
+//   } catch (error) {
+//     res.status(500).json({ error: error, sucess: false });
+//   }
+// });
 
 router.post("/", async (req, res) => {
-  console.log(req.body);
   const { name, pass, email, user } = req.body;
 
   if (!name) {
@@ -93,11 +96,39 @@ router.post("/", async (req, res) => {
     return;
   }
 
-  const userData = { name, pass, email, user };
+  const userData = { name, pass: pass, email, user };
 
   try {
-    await User.create(userData);
-    res.status(201).json({ sucess: true });
+    const user = await User.create(userData).then((response) => {
+      return response;
+    });
+
+    res.status(201).json({ user, sucess: true });
+  } catch (error) {
+    res.status(500).json({ error: error, sucess: false });
+  }
+});
+
+router.delete("/", async (req, res) => {
+  try {
+    console.log("req.query", { q: req.query });
+    if (!req.query?.user) {
+      res.status(500).json({ error: "Usuário é obrigatório.", sucess: false });
+    }
+    const { user: idExc } = req.query;
+    if (!!req.query?.all) {
+      console.log("delete all");
+      await Carteira.deleteMany({ user: idExc });
+      await Parcelados.deleteMany({ user: idExc });
+      await Lancamentos.deleteMany({ user: idExc });
+      await Extra.deleteMany({ user: idExc });
+    }
+
+    const user = await User.deleteOne({ _id: idExc });
+
+    res
+      .status(201)
+      .json({ message: "user excluido com sucesso", sucess: true, user });
   } catch (error) {
     res.status(500).json({ error: error, sucess: false });
   }
