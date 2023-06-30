@@ -111,13 +111,11 @@ router.post("/", async (req, res) => {
 
 router.delete("/", async (req, res) => {
   try {
-    console.log("req.query", { q: req.query });
     if (!req.query?.user) {
       res.status(500).json({ error: "Usuário é obrigatório.", sucess: false });
     }
     const { user: idExc } = req.query;
     if (!!req.query?.all) {
-      console.log("delete all");
       await Carteira.deleteMany({ user: idExc });
       await Parcelados.deleteMany({ user: idExc });
       await Lancamentos.deleteMany({ user: idExc });

@@ -6,6 +6,7 @@ const parceladosRoutes = require("./routes/parceladosRoutes");
 const carteiraRoutes = require("./routes/carteiraRoutes");
 const lancamentosRoutes = require("./routes/lancamentosRoutes");
 const extasRoutes = require("./routes/extrasRoutes");
+const categoriaRoutes = require("./routes/categoriaRoutes");
 const cors = require("cors");
 
 const app = express();
@@ -25,6 +26,7 @@ app.use("/parcelados", parceladosRoutes);
 app.use("/carteira", carteiraRoutes);
 app.use("/lancamentos", lancamentosRoutes);
 app.use("/extras", extasRoutes);
+app.use("/categoria", categoriaRoutes);
 
 const user = process.env.DB_USER;
 const senha = encodeURIComponent(process.env.DB_PASSWORD);

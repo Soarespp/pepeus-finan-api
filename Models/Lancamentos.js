@@ -11,6 +11,7 @@ const Lancamentos = mongoose.model("Lancamentos", {
   default: Boolean,
   lancamentoCard: Boolean,
   resumo: Boolean,
+  categoria: Object,
 });
 
 module.exports = Lancamentos;

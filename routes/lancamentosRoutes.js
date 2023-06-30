@@ -1,12 +1,24 @@
+const { default: mongoose } = require("mongoose");
+const Categoria = require("../Models/Categoria");
 const Lancamentos = require("../Models/Lancamentos");
 
 const router = require("express").Router();
 
 router.get("/", async (req, res) => {
   try {
+    const categorias = await Categoria.find({ user: req.query.user });
     const lancamentos = await Lancamentos.find(req.query);
 
-    res.status(201).json({ lancamentos });
+    const dataReturn = lancamentos.map((data) => {
+      return {
+        ...data._doc,
+        categoria: categorias.find(
+          (cat) => String(cat._id) === data._doc.categoria._id
+        ),
+      };
+    });
+
+    res.status(201).json({ lancamentos: dataReturn });
   } catch (error) {
     res.status(500).json({ error: error, sucess: false });
   }
@@ -14,9 +26,9 @@ router.get("/", async (req, res) => {
 
 router.get("/:user", async (req, res) => {
   try {
-    const lancamentos = await Lancamentos.find({ user: req.params.user });
+    const lancamento = await Lancamentos.find({ ...req.params });
 
-    res.status(201).json({ lancamentos });
+    res.status(201).json({ lancamento });
   } catch (error) {
     res.status(500).json({ error: error, sucess: false });
   }
@@ -65,7 +77,7 @@ router.delete("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { descricao, valor, dtCompra, dtFim } = req.body;
+  const { descricao, valor, dtCompra } = req.body;
 
   if (!descricao) {
     return res
