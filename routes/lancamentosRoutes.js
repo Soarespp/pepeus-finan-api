@@ -5,6 +5,7 @@ const Lancamentos = require("../Models/Lancamentos");
 const router = require("express").Router();
 
 router.get("/", async (req, res) => {
+  console.log("teste de merge");
   try {
     const categorias = await Categoria.find({ user: req.query.user });
     const lancamentos = await Lancamentos.find(req.query);
