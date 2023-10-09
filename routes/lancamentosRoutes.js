@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:user", async (req, res) => {
+router.get("/:_id", async (req, res) => {
   try {
     const lancamento = await Lancamentos.find({ ...req.params });
 
@@ -34,12 +34,20 @@ router.get("/:user", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/", async (req, res) => {
+  const { valor, vezes } = req.body;
+
+  const dataUpdate = !req.body.dtFim
+    ? { ...req.body, dtFim: null }
+    : { ...req.body };
+
+  let vlParcela = valor / (vezes || 1);
+
   try {
-    const lancamentos = await Lancamentos.findOneAndReplace(
-      { _id: req.params.id },
-      { ...req.body }
-    );
+    const lancamentos = await Lancamentos.findByIdAndUpdate(req.query._id, {
+      ...dataUpdate,
+      vlParcela,
+    });
 
     res.status(201).json({ lancamentos, sucess: true });
   } catch (error) {
@@ -77,7 +85,7 @@ router.delete("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { descricao, valor, dtCompra } = req.body;
+  const { descricao, valor, dtCompra, vezes } = req.body;
 
   if (!descricao) {
     return res
@@ -95,8 +103,10 @@ router.post("/", async (req, res) => {
       .json({ error: "Dt. Compra é obigatória", sucess: false });
   }
 
+  let vlParcela = valor / (vezes || 1);
+
   try {
-    const lancamento = await Lancamentos.create(req.body);
+    const lancamento = await Lancamentos.create({ ...req.body, vlParcela });
     res.status(201).json({ lancamento, sucess: true });
   } catch (error) {
     res.status(500).json({ error: error, sucess: false });

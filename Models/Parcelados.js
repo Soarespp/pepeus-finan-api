@@ -9,6 +9,7 @@ const Parcelados = mongoose.model("Parcelados", {
   dtFim: Date,
   dtCompra: Date,
   observacao: String,
+  vlParcela: Number,
   pessoas: [{ name: String }],
 });
 

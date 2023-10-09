@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const { default: mongoose } = require("mongoose");
+const baseRoutes = require("./routes/baseRoutes");
 const userRoutes = require("./routes/userRoutes");
 const parceladosRoutes = require("./routes/parceladosRoutes");
 const carteiraRoutes = require("./routes/carteiraRoutes");
@@ -16,11 +17,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 //Finan
-app.get("/", (req, res) => {
-  res.json({ message: "sucesso" });
-});
+// app.get("/", (req, res) => {
+//   res.json({ message: "sucesso" });
+// });
 
 //Routes
+app.use("/", baseRoutes);
 app.use("/user", userRoutes);
 app.use("/parcelados", parceladosRoutes);
 app.use("/carteira", carteiraRoutes);

@@ -1,4 +1,5 @@
 const Carteira = require("../Models/Carteira");
+const Categoria = require("../Models/Categoria");
 const Extra = require("../Models/Extra");
 const Lancamentos = require("../Models/Lancamentos");
 const Parcelados = require("../Models/Parcelados");
@@ -15,26 +16,17 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/login/:user/:pass", async (req, res) => {
+router.get("/login", async (req, res) => {
+  console.log("login", { ...req.query });
   try {
     const usuarioFind = await User.findOne({
-      user: req.params.user,
-      pass: req.params.pass,
+      ...req.query,
     });
 
-    if (!usuarioFind) {
-      res.status(222).json({ error: "Usuário não encontrado", sucess: false });
-      return;
-    }
-
-    const usuario = {
-      _id: usuarioFind._id,
-      name: usuarioFind.name,
-      pass: usuarioFind.pass,
-      user: usuarioFind.user,
-    };
+    const carteira = await Carteira.findOne({ user: usuarioFind._id });
     res.status(201).json({
-      usuario,
+      usuario: usuarioFind,
+      carteira,
       sucess: true,
     });
   } catch (error) {
@@ -44,7 +36,7 @@ router.get("/login/:user/:pass", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.params.id });
+    const user = await User.findById(req.params.id);
 
     res.status(201).json({ user, sucess: true });
   } catch (error) {
@@ -103,7 +95,12 @@ router.post("/", async (req, res) => {
       return response;
     });
 
-    res.status(201).json({ user, sucess: true });
+    const carteira = await Carteira.create({
+      user: user._id,
+      salario: 0,
+    });
+
+    res.status(201).json({ user, carteira, sucess: true });
   } catch (error) {
     res.status(500).json({ error: error, sucess: false });
   }
@@ -119,6 +116,7 @@ router.delete("/", async (req, res) => {
       await Carteira.deleteMany({ user: idExc });
       await Parcelados.deleteMany({ user: idExc });
       await Lancamentos.deleteMany({ user: idExc });
+      await Categoria.deleteMany({ user: idExc });
       await Extra.deleteMany({ user: idExc });
     }
 

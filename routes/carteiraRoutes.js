@@ -22,14 +22,13 @@ router.get("/:user", async (req, res) => {
   }
 });
 
-router.put("/:user", async (req, res) => {
+router.put("/", async (req, res) => {
   try {
-    const carteira = await Carteira.findOneAndReplace(
-      { user: req.params.user },
-      { ...req.body }
-    );
+    const carteira = await Carteira.findByIdAndUpdate(req.query._id, {
+      ...req.body,
+    });
 
-    res.status(201).json({ carteira: req.body, sucess: true });
+    res.status(201).json({ carteira, sucess: true });
   } catch (error) {
     res.status(500).json({ error: error, sucess: false });
   }
@@ -48,7 +47,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.delete("/", async (req, res) => {
-  if (!req.query?.user) {
+  if (!req.query?.user || req.query.length === 0) {
     res
       .status(500)
       .json({ error: "obrigatorio passar os dados do usuário", sucess: false });

@@ -11,6 +11,7 @@ const Lancamentos = mongoose.model("Lancamentos", {
   default: Boolean,
   lancamentoCard: Boolean,
   resumo: Boolean,
+  vlParcela: Number,
   categoria: Object,
 });
 
